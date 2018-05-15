@@ -14,8 +14,6 @@ namespace NetzplanTool
             foreach (var arg in args)
             {
                 ReadFile(arg);
-                Console.ReadLine();
-                Console.Clear();
             }
         }
 

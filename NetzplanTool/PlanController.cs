@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,9 +36,17 @@ namespace NetzplanTool
             }
         }
         private string Ueberschrift { get; set; }
-        private int Gesamtdauer { get {
-                int i = 0;
-                return i;
+        private string Gesamtdauer { get {
+                if(Repo.GetStarts().Count > 1 || Repo.GetEnds().Count > 1)
+                {
+                    return "nicht eindeutig";
+                }
+                int c = 0;
+                foreach (var v in Repo.GetAll())
+                {
+                    c += v.Dauer;
+                }
+                return ""+c;
             } }
         private Repository Repo { get; set; }
 
@@ -169,9 +178,68 @@ namespace NetzplanTool
             return false;
         }
 
-        public void WriteFile(String filepath)
+        public void WriteFile(string filepath)
         {
+            List<String> linesList = new List<String>
+            {
+                Ueberschrift,"","Vorgangsnummer; Vorgangsbezeichnung; D; FAZ; FEZ; SAZ; SEZ; GP; FP"
+            };
 
+            foreach (var v in Repo.GetAll())
+            {
+                var vString = v.Id + "; " +v.Bezeichnung + "; " +v.Dauer + "; " +v.FAZ + "; " +v.FEZ + "; " +v.SAZ + "; " +v.SEZ + "; " +v.GP + "; " +v.FP;
+                linesList.Add(vString);
+            }
+
+            linesList.Add("");
+            
+            string anfaengeTemp = "";
+            var anfaenge = Repo.GetStarts().ToArray();
+            for(int i = 0; i < anfaenge.Length;i++)
+            {
+                anfaengeTemp += anfaenge[i].Id;
+                if(i < anfaenge.Length - 1)
+                {
+                    anfaengeTemp += ", ";
+                }
+            }
+            linesList.Add("Anfangsvorgang: "+anfaengeTemp);
+
+            string endenTemp = "";
+            var enden = Repo.GetEnds().ToArray();
+            for (int i = 0; i < enden.Length; i++)
+            {
+                endenTemp += enden[i].Id;
+                if (i < enden.Length - 1)
+                {
+                    endenTemp += ", ";
+                }
+            }
+            linesList.Add("Endvorgang: " + endenTemp);
+
+
+            linesList.Add("Gesamtdauer: " + Gesamtdauer);
+            linesList.Add("");
+            linesList.Add("Kritische(r) Pfad(e)");
+            
+            foreach(var p in KritischePfade)
+            {
+                string pfad = "";
+                var arr = p.ToArray();
+                for(int i = 0; i < arr.Length; i++)
+                {
+                    pfad += arr[i].Id;
+                    if(i < arr.Length - 1)
+                    {
+                        pfad += "->";
+                    }
+                }
+                linesList.Add(pfad);
+            }
+
+            string filename = Path.GetDirectoryName(filepath) + '\\' + Path.GetFileNameWithoutExtension(filepath);
+
+            File.WriteAllLines(@filename+"_solved.txt", linesList.ToArray());
         }
     }
 }
