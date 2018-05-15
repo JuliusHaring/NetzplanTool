@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace NetzplanTool
 {
+    /// <summary>
+    /// Beschreibt einen Vorgang welcher ein Element des Netzplans darstellt.
+    /// </summary>
     class Vorgang
     {
         /// <summary>
