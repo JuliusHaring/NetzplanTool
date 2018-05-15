@@ -45,7 +45,7 @@ namespace NetzplanTool
         private List<int> LVorgaenger { get; set; }
 
 
-        public Vorgang(int Id, string Bezeichnung, int[] Vorgaenger, int[] Nachfolger)
+        public Vorgang(int Id, string Bezeichnung, int Dauer, int[] Vorgaenger, int[] Nachfolger)
         {
             LNachfolger = new List<int>();
             LVorgaenger = new List<int>();
