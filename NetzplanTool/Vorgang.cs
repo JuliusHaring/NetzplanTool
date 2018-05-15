@@ -161,5 +161,23 @@ namespace NetzplanTool
             }
             return ret;
         }
+
+        /// <summary>
+        /// Überprüft ob das Objekt Vorgänger und Nachfolger hat.
+        /// </summary>
+        /// <param name="repo">Verweis auf das zu verwendende Repository.</param>
+        /// <returns>true wenn alle Vorgänger und Nachfolger existieren, sonst false.</returns>
+        internal Boolean HatVundN(Repository Repo)
+        {
+            foreach(var v in LVorgaenger)
+            {
+                return Repo.IndexExistiert(v);
+            }
+            foreach(var n in LNachfolger)
+            {
+                return Repo.IndexExistiert(n);
+            }
+            return false;
+        }
     }
 }

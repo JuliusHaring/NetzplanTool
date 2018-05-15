@@ -76,5 +76,22 @@ namespace NetzplanTool
         {
             return Vorgaenge.FindAll(x => x.isEnd);
         }
+
+        /// <summary>
+        /// Überprüft ob ein Index im Repository vorhanden ist.
+        /// </summary>
+        /// <param name="id">Zu überprüfender Index.</param>
+        /// <returns>true wenn der Vorgang existiert, sonst false.</returns>
+        public Boolean IndexExistiert(int Id)
+        {
+            foreach(var v in Vorgaenge)
+            {
+                if(v.Id == Id)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

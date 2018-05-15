@@ -47,7 +47,10 @@ namespace NetzplanTool
                     }
                     if (ToReturn)
                     {
-                        ret.Add(list);
+                        if (list.Count > 1)
+                        {
+                            ret.Add(list);
+                        }
                     }
                 }
                 return ret;
@@ -295,14 +298,22 @@ namespace NetzplanTool
 
             foreach (var v in Repo.GetAll())
             {
-                var vString = v.Id + "; " +v.Bezeichnung + "; " +v.Dauer + "; " +v.FAZ + "; " +v.FEZ + "; " +v.SAZ + "; " +v.SEZ + "; " +v.GP + "; " +v.FP;
+                string vString;
+                if(v.isStart && v.isEnd || !v.HatVundN(Repo))
+                {
+                    vString = v.Id + "; " + v.Bezeichnung + "=> Ungenutzt!";
+                } else
+                {
+                    vString = v.Id + "; " + v.Bezeichnung + "; " + v.Dauer + "; " + v.FAZ + "; " + v.FEZ + "; " + v.SAZ + "; " + v.SEZ + "; " + v.GP + "; " + v.FP;
+                }
+               
                 linesList.Add(vString);
             }
 
             linesList.Add("");
             
             string anfaengeTemp = "";
-            var anfaenge = Repo.GetStarts().ToArray();
+            var anfaenge = Repo.GetStarts().FindAll(x=>!x.isEnd).ToArray();
             for(int i = 0; i < anfaenge.Length;i++)
             {
                 anfaengeTemp += anfaenge[i].Id;
@@ -314,7 +325,7 @@ namespace NetzplanTool
             linesList.Add("Anfangsvorgang: "+anfaengeTemp);
 
             string endenTemp = "";
-            var enden = Repo.GetEnds().ToArray();
+            var enden = Repo.GetEnds().FindAll(x=> !x.isStart).ToArray();
             for (int i = 0; i < enden.Length; i++)
             {
                 endenTemp += enden[i].Id;
