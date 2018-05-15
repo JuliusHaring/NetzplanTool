@@ -9,6 +9,31 @@ namespace NetzplanTool
     class PlanController
     {
         private List<List<Vorgang>> Pfade { get; set; }
+        private List<List<Vorgang>> KritischePfade {
+            get{
+                List<List<Vorgang>> ret = new List<List<Vorgang>>();
+                foreach(var list in Pfade)
+                {
+                    Boolean ToReturn = true;
+                    if (!list.First().isStart|| !list.Last().isEnd)
+                    {
+                        ToReturn = false;
+                    }
+                    foreach(var el in list)
+                    {
+                        if (!el.isKritisch)
+                        {
+                            ToReturn = false;
+                        }
+                    }
+                    if (ToReturn)
+                    {
+                        ret.Add(list);
+                    }
+                }
+                return ret;
+            }
+        }
         private string Ueberschrift { get; set; }
         private int Gesamtdauer { get {
                 int i = 0;
@@ -29,25 +54,6 @@ namespace NetzplanTool
             KalkRueckwaerts();
             KalkPuffer();
             KalkPfad();
-            CheckZusammenhang();
-
-            TESTDELETE();
-        }
-
-        private void TESTDELETE()
-        {
-            foreach(var v in Repo.GetAll())
-            {
-                Console.WriteLine("Id: "+v.Id);
-                Console.WriteLine("Bezecihnung: "+v.Bezeichnung);
-                Console.WriteLine("FAZ: "+v.FAZ);
-                Console.WriteLine("FEZ: "+v.FEZ);
-                Console.WriteLine("SAZ: "+v.SAZ);
-                Console.WriteLine("SEZ: "+v.SEZ);
-                Console.WriteLine("GP: " + v.GP);
-                Console.WriteLine("FP: " + v.FP);
-                Console.WriteLine("___________");
-            }
         }
 
         private void ProcessInputVorgaenge(List<Vorgang> Vorgaenge)
@@ -127,12 +133,40 @@ namespace NetzplanTool
 
         private void KalkPfad()
         {
-
+            foreach(var s in Repo.GetStarts())
+            {
+                KalkPfad(new List<Vorgang> { s });
+            }
         }
 
-        private void CheckZusammenhang()
+        private void KalkPfad(List<Vorgang> p)
         {
+            Pfade.Add(p);
+            foreach(var n in p.Last().Nachfolger(Repo))
+            {
+                if (!ListContainsVorgang(p, n))
+                {
+                    List<Vorgang> temp = new List<Vorgang>(p);
+                    temp.Add(n);
+                    KalkPfad(temp);
+                }
+                else
+                {
+                    throw new ArgumentException("Die Angegebenen Vorgänge enthalten einen Zyklus!");
+                }
+            }
+        }
 
+        private Boolean ListContainsVorgang(List<Vorgang> l, Vorgang v)
+        {
+            foreach(var e in l)
+            {
+                if(e.Id == v.Id)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void WriteFile(String filepath)
