@@ -98,7 +98,7 @@ namespace NetzplanTool
         }
 
         /// <summary>
-        /// Startet die rekursive Überprüfung auf Zyklen innerhalb des Netzplanes.
+        /// Startet die rekursive Überprüfung auf Zyklen innerhalb des Netzplanes. für jeden Vorgang des Repositores.
         /// </summary>
         /// <returns>true falls ein Zyklus vorliegt, false falls nicht.</returns>
         private Boolean HasZyklus()
@@ -114,7 +114,8 @@ namespace NetzplanTool
         }
 
         /// <summary>
-        /// Rekursive Überprüfung auf Zyklen.
+        /// Rekursive Überprüfung auf Zyklen indem der überprüft wird ob der Index eines beliebigen Nachfolgers bereits besucht wurde.
+        /// Andernfalls wird der Nachfolger einem Klon der Liste hinzugefügt und mit diesem weitergerechnet.
         /// </summary>
         /// <param name="v">Aktuell zu überprüfendes Vorgang-Objekt.</param>
         /// <param name="list">Liste der bereits überprüften Vorgänge.</param>
@@ -134,7 +135,10 @@ namespace NetzplanTool
             return false;
         }
 
-
+        /// <summary>
+        /// Fügt die Liste der Vorgänge dem Repository hinzu.
+        /// </summary>
+        /// <param name="Vorgaenge">Liste der hinzuzufügenden Objekte.</param>
         private void ProcessInputVorgaenge(List<Vorgang> Vorgaenge)
         {
             foreach (var v in Vorgaenge)
@@ -143,6 +147,9 @@ namespace NetzplanTool
             }
         }
 
+        /// <summary>
+        /// Startet die rekursive Vorwärtsrechnung zur Bestimmung von frühesten Start- und Endzeiten bei allen Startobjekten.
+        /// </summary>
         private void KalkVorwaerts()
         {
             foreach(var s in Repo.GetStarts())
@@ -151,6 +158,11 @@ namespace NetzplanTool
             }
         }
 
+        /// <summary>
+        /// Weist dem Vorgang FAZ = 0 zu falls dieser ein Startvorgang ist. Andernfalls wird die größte früheste Endzeit aller Vorgänger für diesen Wert verwendet.
+        /// Setzt die früheste Endzeit aus der Dauer und der frühesten Anfangszeit zusammen.
+        /// </summary>
+        /// <param name="v">Zu verarbeitender Vorgang.</param>
         private void KalkVorwaerts(Vorgang v)
         {
             if (v.isStart)
@@ -168,6 +180,9 @@ namespace NetzplanTool
             }
         }
 
+        /// <summary>
+        /// Startet die rekursive Rückwärtsrechnung zur Bestimmung von frühesten Start- und Endzeiten bei allen Endobjekten.
+        /// </summary>
         private void KalkRueckwaerts()
         {
             foreach (var e in Repo.GetEnds())
@@ -176,6 +191,11 @@ namespace NetzplanTool
             }
         }
 
+        /// <summary>
+        /// Weist dem Vorgang SEZ = FEZ zu falls dieser ein Endvorgang ist. Andernfalls wird die kleinste späteste Anfangszeit aller Nachfolger für diesen Wert verwendet.
+        /// Setzt die früheste Endzeit aus der Dauer und der frühesten Anfangszeit zusammen.
+        /// </summary>
+        /// <param name="v">Zu verarbeitender Vorgang.</param>
         private void KalkRueckwaerts(Vorgang v)
         {
             if (v.isEnd)
@@ -193,6 +213,10 @@ namespace NetzplanTool
             }
         }
 
+        /// <summary>
+        /// Weist jedem Vorgang den Gesamtpuffer, also die differenz aus spätester und frühester Endzeit zu.
+        /// Wiest außerdem dem freien Puffer die niedrigste früheste Anfangszeit aller Nachfolger abzüglich der eigenen frühesten Anfangszeit zu.
+        /// </summary>
         private void KalkPuffer()
         {
             foreach(var v in Repo.GetAll())
@@ -210,6 +234,9 @@ namespace NetzplanTool
             }
         }
 
+        /// <summary>
+        /// Startet die rekursive Erstellung aller Kombinationen von Pfaden des Netzplanes bei allen Startpunkten.
+        /// </summary>
         private void KalkPfad()
         {
             foreach(var s in Repo.GetStarts())
@@ -218,6 +245,10 @@ namespace NetzplanTool
             }
         }
 
+        /// <summary>
+        /// Rekursive Erstellung aller möglichen Pfadkombinaionen.
+        /// </summary>
+        /// <param name="p"></param>
         private void KalkPfad(List<Vorgang> p)
         {
             Pfade.Add(p);
@@ -229,13 +260,15 @@ namespace NetzplanTool
                     temp.Add(n);
                     KalkPfad(temp);
                 }
-                else
-                {
-                    throw new ArgumentException("Die Angegebenen Vorgänge enthalten einen Zyklus!");
-                }
             }
         }
 
+        /// <summary>
+        /// Gibt an ob ein Vorgang bereits in einer Liste vorhanden ist.
+        /// </summary>
+        /// <param name="l">Zu überprüfende Liste.</param>
+        /// <param name="v">Zu überprüfender Vorgang.</param>
+        /// <returns>true falls der Vorgang bereits in der Liste enthalten ist, false falls nicht.</returns>
         private Boolean ListContainsVorgang(List<Vorgang> l, Vorgang v)
         {
             foreach(var e in l)
@@ -248,6 +281,10 @@ namespace NetzplanTool
             return false;
         }
 
+        /// <summary>
+        /// Erstellt die Ausgabedatei basierend auf den zuvor errechneten Werten.
+        /// </summary>
+        /// <param name="filepath">Pfad der Eingabedatei.</param>
         public void WriteFile(string filepath)
         {
             List<String> linesList = new List<String>
@@ -312,6 +349,10 @@ namespace NetzplanTool
             File.WriteAllLines(@filename+"_solved.txt", linesList.ToArray());
         }
 
+        /// <summary>
+        /// Schreibt im Falle eines Zyklus die Fehlerdatei welche dann ausgegeben wird.
+        /// </summary>
+        /// <param name="filepath"></param>
         private void WriteFileZyklus(string filepath)
         {
             List<String> linesList = new List<String>
