@@ -11,6 +11,7 @@ namespace NetzplanTool
         public int Id { get; }
         public int FAZ { get; set; }
         public int FEZ { get; set; }
+        public int SAZ { get; set; }
         public int SEZ { get; set; }
         public int Dauer { get; set; }
         public int GP { get; set; }
@@ -52,6 +53,7 @@ namespace NetzplanTool
 
             this.Id = Id;
             this.Bezeichnung = Bezeichnung;
+            this.Dauer = Dauer;
 
             foreach(var v in Vorgaenger)
             {
