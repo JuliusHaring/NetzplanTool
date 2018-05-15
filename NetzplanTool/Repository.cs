@@ -34,12 +34,17 @@ namespace NetzplanTool
                     return v;
                 }
             }
-            throw new IndexOutOfRangeException("Es wurde versucht einen nicht bestehenden Vorgang zu erreichen");
+            throw new IndexOutOfRangeException("Für die angegebene Id ist kein Vorgang hinterlegt");
         }
 
         public List<Vorgang> GetStarts()
         {
             return Vorgaenge.FindAll(x => x.isStart);
+        }
+
+        public List<Vorgang> GetEnds()
+        {
+            return Vorgaenge.FindAll(x => x.isEnd);
         }
     }
 }

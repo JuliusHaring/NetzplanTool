@@ -14,8 +14,9 @@ namespace NetzplanTool
             foreach (var arg in args)
             {
                 ReadFile(arg);
+                Console.ReadLine();
+                Console.Clear();
             }
-            Console.ReadLine();
         }
 
         private static void ReadFile(string filepath)

@@ -38,12 +38,14 @@ namespace NetzplanTool
         {
             foreach(var v in Repo.GetAll())
             {
-                Console.WriteLine(v.Id);
-                Console.WriteLine(v.Bezeichnung);
-                Console.WriteLine(v.FAZ);
-                Console.WriteLine(v.FEZ);
-                Console.WriteLine(v.SAZ);
-                Console.WriteLine(v.SEZ);
+                Console.WriteLine("Id: "+v.Id);
+                Console.WriteLine("Bezecihnung: "+v.Bezeichnung);
+                Console.WriteLine("FAZ: "+v.FAZ);
+                Console.WriteLine("FEZ: "+v.FEZ);
+                Console.WriteLine("SAZ: "+v.SAZ);
+                Console.WriteLine("SEZ: "+v.SEZ);
+                Console.WriteLine("GP: " + v.GP);
+                Console.WriteLine("FP: " + v.FP);
                 Console.WriteLine("___________");
             }
         }
@@ -73,8 +75,6 @@ namespace NetzplanTool
             else
             {
                 v.FAZ = v.Vorgaenger(Repo).OrderByDescending(o => o.FEZ).ToList().First().FEZ;
-                var vorgaenger = v.Vorgaenger(Repo).OrderByDescending(o => o.FEZ).ToList();
-                var candidate = vorgaenger.First();
             }
             v.FEZ = v.FAZ + v.Dauer;
             foreach(var n in v.Nachfolger(Repo))
@@ -85,17 +85,44 @@ namespace NetzplanTool
 
         private void KalkRueckwaerts()
         {
-
+            foreach (var e in Repo.GetEnds())
+            {
+                KalkRueckwaerts(e);
+            }
         }
 
         private void KalkRueckwaerts(Vorgang v)
         {
-
+            if (v.isEnd)
+            {
+                v.SEZ = v.FEZ;
+            }
+            else
+            {
+                v.SEZ = v.Nachfolger(Repo).OrderBy(o => o.SAZ).ToList().First().SAZ;
+            }
+            v.SAZ = v.SEZ - v.Dauer;
+            foreach (var vo in v.Vorgaenger(Repo))
+            {
+                KalkRueckwaerts(vo);
+            }
         }
 
         private void KalkPuffer()
         {
+            foreach(var v in Repo.GetAll())
+            {
+                v.GP = v.SEZ - v.FEZ;
 
+                if(v.Nachfolger(Repo).Count > 0)
+                {
+                    v.FP = v.Nachfolger(Repo).OrderBy(o => o.FAZ).ToList().First().FAZ - v.FEZ;
+                }
+                else
+                {
+                    v.FP = 0;
+                }                
+            }
         }
 
         private void KalkPfad()
