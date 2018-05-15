@@ -44,12 +44,7 @@ namespace NetzplanTool
                 {
                     return "nicht eindeutig";
                 }
-                int c = 0;
-                foreach (var v in Repo.GetAll())
-                {
-                    c += v.Dauer;
-                }
-                return ""+c;
+                return ""+Repo.GetEnds().First().SEZ;
             }
         }
 
