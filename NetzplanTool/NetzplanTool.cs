@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NetzplanTool
 {
-    class NetplanTool
+    class NetzplanTool
     {
         static void Main(string[] args)
         {
