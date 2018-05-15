@@ -7,8 +7,15 @@ using System.Threading.Tasks;
 
 namespace NetzplanTool
 {
+    /// <summary>
+    /// Hauptklasse des Programms.
+    /// </summary>
     class NetzplanTool
     {
+        /// <summary>
+        /// Die Main-Methode wird als Haupt-Thread gestartet und ruft für jeden Dateipfad eine Hilfs-Methode.
+        /// </summary>
+        /// <param name="args">Dateipfade, getrennt durch Leerzeichen.</param>
         static void Main(string[] args)
         {
             foreach (var arg in args)
@@ -17,6 +24,10 @@ namespace NetzplanTool
             }
         }
 
+        /// <summary>
+        /// Analysiert die Eingabedatei  durch Hilfsmethoden und eröffnet den ausführenden PlanController.
+        /// </summary>
+        /// <param name="filepath">Pfad einer einzulesenden Datei.</param>
         private static void ReadFile(string filepath)
         {
             using (var sr = new StreamReader(filepath, Encoding.Default))
@@ -29,6 +40,11 @@ namespace NetzplanTool
             }
         }
 
+        /// <summary>
+        /// Durchsucht den Kommentarbereich der Eingabedatei nachd er Überschrift.
+        /// </summary>
+        /// <param name="lines">Inhalt der Eingangsdatei nach Zeilen aufgespaltet.</param>
+        /// <returns>Überschrift des Netzplanes.</returns>
         private static string FindHeading(string[] lines)
         {
             string ret = "";
@@ -42,6 +58,11 @@ namespace NetzplanTool
             return ret;
         }
 
+        /// <summary>
+        /// Durchsucht die Datei nach dem Teil nach dem Kommentarbereich.
+        /// </summary>
+        /// <param name="lines">Inhalt der Eingangsdatei nach Zeilen aufgespaltet.</param>
+        /// <returns>Liste aller eingelesenen Vorgänge</returns>
         private static List<Vorgang> ListVorgaenge(string[] lines)
         {
             List<Vorgang> ret = new List<Vorgang>();
@@ -58,6 +79,11 @@ namespace NetzplanTool
             return ret;
         }
 
+        /// <summary>
+        /// Erstellt einen Vorgang.
+        /// </summary>
+        /// <param name="line">Eingelesene Zeile</param>
+        /// <returns>Vorgang welcher aus der Zeile erstellt wurde.</returns>
         private static Vorgang CreateVorgang(string line)
         {
             string[] attributes = line.Split(';');
