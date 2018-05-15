@@ -9,6 +9,9 @@ namespace NetzplanTool
 {
     class PlanController
     {
+        private string Ueberschrift { get; set; }
+        private Repository Repo { get; set; }
+
         private List<List<Vorgang>> Pfade { get; set; }
         private List<List<Vorgang>> KritischePfade {
             get{
@@ -35,7 +38,7 @@ namespace NetzplanTool
                 return ret;
             }
         }
-        private string Ueberschrift { get; set; }
+        
         private string Gesamtdauer { get {
                 if(Repo.GetStarts().Count > 1 || Repo.GetEnds().Count > 1)
                 {
@@ -47,10 +50,10 @@ namespace NetzplanTool
                     c += v.Dauer;
                 }
                 return ""+c;
-            } }
-        private Repository Repo { get; set; }
+            }
+        }
 
-        public PlanController(string Ueberschrift, List<Vorgang> Vorgaenge)
+        public PlanController(string Ueberschrift, List<Vorgang> Vorgaenge, string filepath)
         {
             Repo = new Repository();
             Pfade = new List<List<Vorgang>>();
@@ -59,11 +62,60 @@ namespace NetzplanTool
 
             this.Ueberschrift = Ueberschrift;
 
-            KalkVorwaerts();
-            KalkRueckwaerts();
-            KalkPuffer();
-            KalkPfad();
+            if (!HasZyklus())
+            {
+                
+                KalkVorwaerts();
+                KalkRueckwaerts();
+                KalkPuffer();
+                KalkPfad();
+                WriteFile(filepath);
+            }
+            else
+            {
+                WriteFileZyklus(filepath);
+            }
         }
+
+        private Boolean HasZyklus()
+        {
+            foreach (var vorgang in Repo.GetAll())
+            {
+                /**
+                foreach(var n in vorgang.Nachfolger(Repo))
+                {
+                    foreach(var n2 in n.Nachfolger(Repo))
+                    {
+                        if (n2.Id == vorgang.Id)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            **/
+                if(HasZyklus(vorgang,new List<int> { vorgang.Id }))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private Boolean HasZyklus(Vorgang v, List<int> list)
+        {
+            foreach (var n in v.Nachfolger(Repo))
+            {
+                if(list.IndexOf(n.Id) > -1)
+                {
+                    return true;
+                }
+                var temp = new List<int>(list);
+                temp.Add(n.Id);
+                return HasZyklus(n, temp);
+            }
+            return false;
+        }
+
 
         private void ProcessInputVorgaenge(List<Vorgang> Vorgaenge)
         {
@@ -240,6 +292,18 @@ namespace NetzplanTool
             string filename = Path.GetDirectoryName(filepath) + '\\' + Path.GetFileNameWithoutExtension(filepath);
 
             File.WriteAllLines(@filename+"_solved.txt", linesList.ToArray());
+        }
+
+        private void WriteFileZyklus(string filepath)
+        {
+            List<String> linesList = new List<String>
+            {
+                Ueberschrift,"","Zyklus -> Berechnung nicht möglich!"
+            };
+
+            string filename = Path.GetDirectoryName(filepath) + '\\' + Path.GetFileNameWithoutExtension(filepath);
+
+            File.WriteAllLines(@filename + "_solved.txt", linesList.ToArray());
         }
     }
 }

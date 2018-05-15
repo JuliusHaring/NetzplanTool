@@ -25,8 +25,7 @@ namespace NetzplanTool
                 string ueberschrift = FindHeading(lines);
                 List<Vorgang> vorgaenge = ListVorgaenge(lines);
 
-                PlanController PController = new PlanController(ueberschrift,vorgaenge);
-                PController.WriteFile(filepath);
+                PlanController PController = new PlanController(ueberschrift,vorgaenge,filepath);
             }
         }
 
