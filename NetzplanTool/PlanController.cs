@@ -65,7 +65,7 @@ namespace NetzplanTool
 
         }
 
-        private void WriteFile(String name)
+        public void WriteFile(String filepath)
         {
 
         }
