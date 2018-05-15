@@ -143,7 +143,7 @@ namespace NetzplanTool
 
             string filename = Path.GetDirectoryName(filepath) + '\\' + Path.GetFileNameWithoutExtension(filepath);
 
-            File.WriteAllLines(@filename + "_error.txt", linesList.ToArray());
+            File.WriteAllLines(filename + "_error.txt", linesList.ToArray());
         }
     }
 }

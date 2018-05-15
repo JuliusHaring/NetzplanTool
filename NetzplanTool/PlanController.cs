@@ -89,11 +89,12 @@ namespace NetzplanTool
                 KalkRueckwaerts();
                 KalkPuffer();
                 KalkPfad();
+
                 WriteFile(filepath);
             }
             else
             {
-                WriteFileZyklus(filepath);
+                WriteFileError(filepath, "Zyklus -> Berechnung nicht möglich!");
             }
         }
 
@@ -346,23 +347,24 @@ namespace NetzplanTool
 
             string filename = Path.GetDirectoryName(filepath) + '\\' + Path.GetFileNameWithoutExtension(filepath);
 
-            File.WriteAllLines(@filename+"_solved.txt", linesList.ToArray());
+            File.WriteAllLines(filename+"_solved.txt", linesList.ToArray());
         }
 
         /// <summary>
-        /// Schreibt im Falle eines Zyklus die Fehlerdatei welche dann ausgegeben wird.
+        /// Schreibt im Falle eines Fehlers die Fehlerdatei welche dann ausgegeben wird.
         /// </summary>
-        /// <param name="filepath"></param>
-        private void WriteFileZyklus(string filepath)
+        /// <param name="filepath">Pfad der Eingabedatei.</param>
+        /// <param name="error">Zu schreibende Fehlermeldung.</param>
+        private void WriteFileError(string filepath, string error)
         {
             List<String> linesList = new List<String>
             {
-                Ueberschrift,"","Zyklus -> Berechnung nicht möglich!"
+                Ueberschrift,"", error
             };
 
             string filename = Path.GetDirectoryName(filepath) + '\\' + Path.GetFileNameWithoutExtension(filepath);
 
-            File.WriteAllLines(@filename + "_error.txt", linesList.ToArray());
+            File.WriteAllLines(filename + "_error.txt", linesList.ToArray());
         }
     }
 }
