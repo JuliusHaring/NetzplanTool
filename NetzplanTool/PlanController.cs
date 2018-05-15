@@ -7,12 +7,27 @@ using System.Threading.Tasks;
 
 namespace NetzplanTool
 {
+    /// <summary>
+    /// Controller welcher die Geschäftslogik enthält.
+    /// </summary>
     class PlanController
     {
+        /// <summary>
+        /// Überschrift des Projektes.
+        /// </summary>
         private string Ueberschrift { get; set; }
+        /// <summary>
+        /// Repository welches alle Vorgänge speichert.
+        /// </summary>
         private Repository Repo { get; set; }
 
+        /// <summary>
+        /// Alle möglichen Kombinationen von Pfaden welche der Netzplan beinhaltet.
+        /// </summary>
         private List<List<Vorgang>> Pfade { get; set; }
+        /// <summary>
+        /// Durchsucht Pfade nach kritischen Pfaden und gibt diese in Listenform zurück.
+        /// </summary>
         private List<List<Vorgang>> KritischePfade {
             get{
                 List<List<Vorgang>> ret = new List<List<Vorgang>>();
@@ -39,6 +54,9 @@ namespace NetzplanTool
             }
         }
         
+        /// <summary>
+        /// Gibt die Gesamtdauer des Projektes als string zurück. Gibt es mehr als einen Anfang oder Ende ist diese nicht eindeutig.
+        /// </summary>
         private string Gesamtdauer { get {
                 if(Repo.GetStarts().Count > 1 || Repo.GetEnds().Count > 1)
                 {
@@ -48,6 +66,13 @@ namespace NetzplanTool
             }
         }
 
+        /// <summary>
+        /// Erstellt nach Instanziierung das Repository und die Liste der Pfadkombinationen. 
+        /// Speichert mittels Hilfsmethoden alle Vorgänge im Repository und führt den Rest der Berechnungen für die Netzplanerstellung durch.
+        /// </summary>
+        /// <param name="Ueberschrift">Überschrift des Projektes.</param>
+        /// <param name="Vorgaenge">Zu speichernde Vorgänge in Listenform.</param>
+        /// <param name="filepath">Eingabepfad, genutzt für die Ausgabe der Ergebnisse.</param>
         public PlanController(string Ueberschrift, List<Vorgang> Vorgaenge, string filepath)
         {
             Repo = new Repository();
@@ -72,22 +97,14 @@ namespace NetzplanTool
             }
         }
 
+        /// <summary>
+        /// Startet die rekursive Überprüfung auf Zyklen innerhalb des Netzplanes.
+        /// </summary>
+        /// <returns>true falls ein Zyklus vorliegt, false falls nicht.</returns>
         private Boolean HasZyklus()
         {
             foreach (var vorgang in Repo.GetAll())
             {
-                /**
-                foreach(var n in vorgang.Nachfolger(Repo))
-                {
-                    foreach(var n2 in n.Nachfolger(Repo))
-                    {
-                        if (n2.Id == vorgang.Id)
-                        {
-                            return true;
-                        }
-                    }
-                }
-            **/
                 if(HasZyklus(vorgang,new List<int> { vorgang.Id }))
                 {
                     return true;
@@ -96,6 +113,12 @@ namespace NetzplanTool
             return false;
         }
 
+        /// <summary>
+        /// Rekursive Überprüfung auf Zyklen.
+        /// </summary>
+        /// <param name="v">Aktuell zu überprüfendes Vorgang-Objekt.</param>
+        /// <param name="list">Liste der bereits überprüften Vorgänge.</param>
+        /// <returns>true falls ein Zyklus vorliegt, false falls nicht.</returns>
         private Boolean HasZyklus(Vorgang v, List<int> list)
         {
             foreach (var n in v.Nachfolger(Repo))
@@ -298,7 +321,7 @@ namespace NetzplanTool
 
             string filename = Path.GetDirectoryName(filepath) + '\\' + Path.GetFileNameWithoutExtension(filepath);
 
-            File.WriteAllLines(@filename + "_solved.txt", linesList.ToArray());
+            File.WriteAllLines(@filename + "_error.txt", linesList.ToArray());
         }
     }
 }

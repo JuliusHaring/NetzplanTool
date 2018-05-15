@@ -32,11 +32,17 @@ namespace NetzplanTool
         {
             using (var sr = new StreamReader(filepath, Encoding.Default))
             {
+                try { 
                 string[] lines = sr.ReadToEnd().Split('\n');
                 string ueberschrift = FindHeading(lines);
-                List<Vorgang> vorgaenge = ListVorgaenge(lines);
+                List<Vorgang> vorgaenge = ListVorgaenge(lines,filepath);
 
                 PlanController PController = new PlanController(ueberschrift,vorgaenge,filepath);
+                }catch(Exception e)
+                {
+                    WriteInputException(filepath, e);
+                }
+
             }
         }
 
@@ -62,8 +68,9 @@ namespace NetzplanTool
         /// Durchsucht die Datei nach dem Teil nach dem Kommentarbereich.
         /// </summary>
         /// <param name="lines">Inhalt der Eingangsdatei nach Zeilen aufgespaltet.</param>
+        /// <param name="filepath">Pfad der einzulesenden Datei.</param>
         /// <returns>Liste aller eingelesenen Vorgänge</returns>
-        private static List<Vorgang> ListVorgaenge(string[] lines)
+        private static List<Vorgang> ListVorgaenge(string[] lines,string filepath)
         {
             List<Vorgang> ret = new List<Vorgang>();
 
@@ -72,6 +79,8 @@ namespace NetzplanTool
                 if (line.IndexOf("//") != 0)
                 {
                     Vorgang v = CreateVorgang(line);
+                    
+                    
                     ret.Add(v);
                 }
             }
@@ -118,6 +127,23 @@ namespace NetzplanTool
             }
 
             return new Vorgang(Id,Bezeichnung,Dauer,Vorgaenger,Nachfolger);
+        }
+
+        /// <summary>
+        /// Schreibt bei Fehlerhafter Eingabedatei den Fehler in eine Datei.
+        /// </summary>
+        /// <param name="filepath">Pfad der Eingabedatei.</param>
+        /// <param name="e">Ausnahme welche ausgegeben werden soll.</param>
+        private static void WriteInputException(string filepath, Exception e)
+        {
+            List<String> linesList = new List<String>
+            {
+                "Exception:",e.Message
+            };
+
+            string filename = Path.GetDirectoryName(filepath) + '\\' + Path.GetFileNameWithoutExtension(filepath);
+
+            File.WriteAllLines(@filename + "_error.txt", linesList.ToArray());
         }
     }
 }
