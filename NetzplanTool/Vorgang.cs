@@ -8,7 +8,6 @@ namespace NetzplanTool
 {
     class Vorgang
     {
-        public Repository Repo { get; set; }
         public int Id { get; }
         public int FAZ { get; set; }
         public int FEZ { get; set; }
@@ -48,7 +47,6 @@ namespace NetzplanTool
 
         public Vorgang(int Id, string Bezeichnung, int[] Vorgaenger, int[] Nachfolger)
         {
-            this.Repo = Repo;
             LNachfolger = new List<int>();
             LVorgaenger = new List<int>();
 
