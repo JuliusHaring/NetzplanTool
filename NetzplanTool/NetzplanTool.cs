@@ -20,7 +20,15 @@ namespace NetzplanTool
         {
             foreach (var arg in args)
             {
-                ReadFile(arg);
+                if (Path.IsPathRooted(arg))
+                {
+                    ReadFile(arg);
+                }
+                else
+                {
+                    var path = Directory.GetCurrentDirectory()+'\\'+arg.Replace('/','\\');
+                    ReadFile(path);
+                }
             }
         }
 
