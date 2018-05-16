@@ -56,6 +56,10 @@ namespace NetzplanTool
             string ret = "";
             foreach (var line in lines)
             {
+                if (!ret.Equals(""))
+                {
+                    ret += "\n";
+                }
                 if (line.IndexOf("//+") == 0)
                 {
                     ret += line.Remove(0, 3);
