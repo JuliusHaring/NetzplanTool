@@ -80,7 +80,7 @@ namespace NetzplanTool
 
             foreach (var line in lines)
             {
-                if (line.IndexOf("//") != 0)
+                if (line.IndexOf("//") != 0 && !line.Equals(""))
                 {
                     Vorgang v = CreateVorgang(line);
                     

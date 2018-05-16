@@ -299,7 +299,7 @@ namespace NetzplanTool
             foreach (var v in Repo.GetAll())
             {
                 string vString;
-                if(v.isStart && v.isEnd || !v.HatVundN(Repo))
+                if(v.isStart && v.isEnd || !v.HatVundN(Repo) || !InPfade(v))
                 {
                     vString = v.Id + "; " + v.Bezeichnung + "=> Ungenutzt!";
                 } else
@@ -359,6 +359,26 @@ namespace NetzplanTool
             string filename = Path.GetDirectoryName(filepath) + '\\' + Path.GetFileNameWithoutExtension(filepath);
 
             File.WriteAllLines(filename+"_solved.txt", linesList.ToArray());
+        }
+
+        /// <summary>
+        /// Überprüft ob ein Vorgang überhaupt in einem Pfad vorkommt.
+        /// </summary>
+        /// <param name="vorgang">Zu überprüfender Vorgang.</param>
+        /// <returns>true falls der Vorgang in einem Pfad vorkommt, sonst false.</returns>
+        private Boolean InPfade(Vorgang vorgang)
+        {
+            foreach(var p in Pfade)
+            {
+                foreach(var v in p)
+                {
+                    if(v.Id == vorgang.Id)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         /// <summary>
